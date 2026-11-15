@@ -108,7 +108,7 @@
   function go(t) {
     $$('.tab').forEach(x => x.classList.toggle('on', x.id === 't-' + t));
     $$('nav button').forEach(x => x.classList.toggle('on', x.dataset.go === t));
-    scrollTo(0, 0);
+    document.body.classList.toggle('on-splash', t === 'splash'); scrollTo(0, 0);
   }
   document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go); });
   const setLang = l => { lang = l; localStorage.setItem('amb_lang', l); $('#lang').textContent = l === 'en' ? 'ଓଡ଼ିଆ' : 'English'; document.documentElement.lang = l; refresh(); };
@@ -127,5 +127,30 @@
   addEventListener('online', net); addEventListener('offline', net); net();
   $('#net').onclick = () => toast(navigator.onLine ? 'Online – app is saved and works offline too' : 'Offline mode – all features still work');
   setLang(lang); renderRecs();
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+  // ---------- update flow ----------
+  const U = { box: $('#upd'), ring: $('#ring'), pct: $('#pct'), t: $('#utitle'), sub: $('#usub'), go: $('#ugo'), later: $('#ulater') };
+  const ring = p => { U.ring.style.strokeDashoffset = 150.8 * (1 - p / 100); U.pct.textContent = p + '%'; };
+  const ui = (state, p = 0) => {
+    U.box.hidden = false; U.box.classList.toggle('spin', state === 'apply');
+    U.go.hidden = U.later.hidden = state !== 'ready';
+    if (state === 'down') { ring(p); U.t.textContent = 'Downloading update…'; U.sub.textContent = 'Please keep the app open'; }
+    if (state === 'ready') { ring(100); U.t.textContent = 'Update available'; U.sub.textContent = 'A new version is ready to install'; }
+    if (state === 'apply') { ring(100); U.t.textContent = 'Installing update…'; U.sub.textContent = 'The app will restart'; }
+  };
+  if (localStorage.getItem('amb_updated')) { localStorage.removeItem('amb_updated'); setTimeout(() => toast('✔ Updated to the latest version'), 600); }
+  if ('serviceWorker' in navigator) {
+    const sw = navigator.serviceWorker; let waiting = null, reloading = false; const had = !!sw.controller;
+    const ready = w => { waiting = w; ui('ready'); };
+    const track = w => w.addEventListener('statechange', () => { if (w.state === 'installed' && sw.controller) ready(w); });
+    sw.register('sw.js').then(reg => {
+      if (reg.waiting && sw.controller) ready(reg.waiting);
+      reg.addEventListener('updatefound', () => { if (sw.controller) { ui('down', 0); track(reg.installing); } });
+      const check = () => reg.update().catch(() => {});
+      setInterval(check, 30 * 60 * 1000); document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+    });
+    sw.addEventListener('message', e => { if (e.data && e.data.type === 'progress' && sw.controller && !waiting) ui('down', e.data.pct); });
+    U.go.onclick = () => { ui('apply'); (waiting || {}).postMessage && waiting.postMessage('SKIP_WAITING'); };
+    U.later.onclick = () => { U.box.hidden = true; };
+    sw.addEventListener('controllerchange', () => { if (!had || reloading) return; reloading = true; localStorage.setItem('amb_updated', '1'); location.reload(); });
+  }
 })();
