@@ -67,6 +67,8 @@ nav button span{display:block;font-size:21px}nav button.on{color:var(--red)}
 .splash .sub{font-size:clamp(24px,8vw,38px);font-weight:800;margin-top:14px;color:#fff;text-shadow:0 2px 10px #000a}
 .splash .tag{margin-top:8px;color:#fff;font-weight:600;letter-spacing:1px;text-transform:uppercase;font-size:13px;text-shadow:0 2px 8px #000a}
 .splash .go{margin-top:28px;border:0;background:#e31e24;color:#fff;border-radius:12px;padding:14px 38px;font:700 17px inherit;font-family:inherit;box-shadow:0 6px 18px #0008}
+.splash .go{min-width:min(78vw,300px)}
+.splash .go.ghost{margin-top:12px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.55);box-shadow:none}
 body.on-splash #lang{z-index:9;top:calc(14px + env(safe-area-inset-top));bottom:auto}
 #toast{z-index:25}
 [hidden]{display:none!important}
@@ -87,6 +89,7 @@ body.on-splash #lang{z-index:9;top:calc(14px + env(safe-area-inset-top));bottom:
       <div class="sub">Mukt Bharat</div>
       <div class="tag">Anemia Free India Campaign</div>
       <button class="go" data-go="info">Continue →</button>
+      <button class="go ghost" id="coverInstall" type="button" hidden>Install app</button>
     </div>
   </section>
   <section class="tab" id="t-info">

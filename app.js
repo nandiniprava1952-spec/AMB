@@ -116,17 +116,20 @@
   let dp; const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const installed = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone || localStorage.getItem('amb_installed') === '1';
   const standalone = () => ['standalone', 'minimal-ui', 'fullscreen'].some(m => matchMedia(`(display-mode: ${m})`).matches) || navigator.standalone;
-  const gone = () => { localStorage.setItem('amb_installed', '1'); $('#install').hidden = true; };
+  const cov = $('#coverInstall');
+  const gone = () => { localStorage.setItem('amb_installed', '1'); $('#install').hidden = true; cov.hidden = true; };
+  cov.hidden = installed();   // cover button shows right away unless the app is already installed
   if (standalone()) $('#install').hidden = true;
   matchMedia('(display-mode: standalone)').addEventListener?.('change', e => { if (e.matches) gone(); });
   const related = () => navigator.getInstalledRelatedApps ? navigator.getInstalledRelatedApps().then(a => { if (a.length) gone(); }).catch(() => {}) : 0;
   related();
   if (ios && !installed()) $('#install').hidden = false;
-  addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; if (standalone()) return; localStorage.removeItem('amb_installed'); $('#install').hidden = false; related(); });
-  addEventListener('appinstalled', () => { localStorage.setItem('amb_installed', '1'); $('#install').hidden = true; toast('App installed ✔'); });
-  $('#install').onclick = async () => {
-    if (dp) { dp.prompt(); const r = await dp.userChoice; if (r.outcome === 'accepted') { localStorage.setItem('amb_installed', '1'); $('#install').hidden = true; } }
-    else alert('Tap the Share button, then "Add to Home Screen".');
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; if (standalone()) return; localStorage.removeItem('amb_installed'); $('#install').hidden = false; cov.hidden = false; related(); });
+  addEventListener('appinstalled', () => { localStorage.setItem('amb_installed', '1'); $('#install').hidden = true; cov.hidden = true; toast('App installed ✔'); });
+  $('#install').onclick = cov.onclick = async () => {
+    if (dp) { dp.prompt(); const r = await dp.userChoice; if (r.outcome === 'accepted') gone(); }
+    else if (ios) alert('Tap the Share button, then "Add to Home Screen".');
+    else toast('To install: open the browser menu (⋮) and tap Install app or Add to Home screen.');
   };
 
   const net = () => { const on = navigator.onLine, b = $('#net'); b.classList.toggle('off', !on); b.lastChild.textContent = on ? 'Online' : 'Offline'; };
