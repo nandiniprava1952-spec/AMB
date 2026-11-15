@@ -115,9 +115,14 @@
   $('#lang').onclick = () => setLang(lang === 'en' ? 'or' : 'en');
   let dp; const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const installed = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone || localStorage.getItem('amb_installed') === '1';
-  const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const standalone = () => ['standalone', 'minimal-ui', 'fullscreen'].some(m => matchMedia(`(display-mode: ${m})`).matches) || navigator.standalone;
+  const gone = () => { localStorage.setItem('amb_installed', '1'); $('#install').hidden = true; };
+  if (standalone()) $('#install').hidden = true;
+  matchMedia('(display-mode: standalone)').addEventListener?.('change', e => { if (e.matches) gone(); });
+  const related = () => navigator.getInstalledRelatedApps ? navigator.getInstalledRelatedApps().then(a => { if (a.length) gone(); }).catch(() => {}) : 0;
+  related();
   if (ios && !installed()) $('#install').hidden = false;
-  addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; if (standalone()) return; localStorage.removeItem('amb_installed'); $('#install').hidden = false; });
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; if (standalone()) return; localStorage.removeItem('amb_installed'); $('#install').hidden = false; related(); });
   addEventListener('appinstalled', () => { localStorage.setItem('amb_installed', '1'); $('#install').hidden = true; toast('App installed ✔'); });
   $('#install').onclick = async () => {
     if (dp) { dp.prompt(); const r = await dp.userChoice; if (r.outcome === 'accepted') { localStorage.setItem('amb_installed', '1'); $('#install').hidden = true; } }
