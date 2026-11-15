@@ -114,12 +114,13 @@
   const setLang = l => { lang = l; localStorage.setItem('amb_lang', l); $('#lang').textContent = l === 'en' ? 'ଓଡ଼ିଆ' : 'English'; document.documentElement.lang = l; refresh(); };
   $('#lang').onclick = () => setLang(lang === 'en' ? 'or' : 'en');
   let dp; const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const installed = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-  if (!installed()) { if (ios) $('#install').hidden = false;
-    addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; $('#install').hidden = false; }); }
-  addEventListener('appinstalled', () => { $('#install').hidden = true; toast('App installed ✔'); });
+  const installed = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone || localStorage.getItem('amb_installed') === '1';
+  const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  if (ios && !installed()) $('#install').hidden = false;
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; if (standalone()) return; localStorage.removeItem('amb_installed'); $('#install').hidden = false; });
+  addEventListener('appinstalled', () => { localStorage.setItem('amb_installed', '1'); $('#install').hidden = true; toast('App installed ✔'); });
   $('#install').onclick = async () => {
-    if (dp) { dp.prompt(); const r = await dp.userChoice; if (r.outcome === 'accepted') $('#install').hidden = true; }
+    if (dp) { dp.prompt(); const r = await dp.userChoice; if (r.outcome === 'accepted') { localStorage.setItem('amb_installed', '1'); $('#install').hidden = true; } }
     else alert('Tap the Share button, then "Add to Home Screen".');
   };
 
