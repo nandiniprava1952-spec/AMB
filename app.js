@@ -9,7 +9,7 @@
   const tpl = s => esc2(s).replace(/\$\{(\w+)\}/g, (_, n) => esc(vals[n] ?? ''))
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
   const esc2 = s => s; // labels come from the trusted form file; only user values are escaped
-  const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), 2200); };
+  const toast = (m, ms = 2200) => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('on'), ms); };
 
   // ---------- build form once ----------
   const dom = {};
@@ -123,7 +123,7 @@
   matchMedia('(display-mode: standalone)').addEventListener?.('change', e => { if (e.matches) gone(); });
   const related = () => navigator.getInstalledRelatedApps ? navigator.getInstalledRelatedApps().then(a => { if (a.length) gone(); }).catch(() => {}) : 0;
   related();
-  if (ios && !installed()) $('#install').hidden = false;
+  $('#install').hidden = installed();   // header 📲 shows right away; hides once installed
   addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; if (standalone()) return; localStorage.removeItem('amb_installed'); $('#install').hidden = false; cov.hidden = false; related(); });
   addEventListener('appinstalled', () => { localStorage.setItem('amb_installed', '1'); $('#install').hidden = true; cov.hidden = true; toast('App installed ✔'); });
   $('#install').onclick = cov.onclick = async () => {
@@ -146,7 +146,7 @@
     if (state === 'ready') { ring(100); U.t.textContent = 'Update available'; U.sub.textContent = 'A new version is ready to install'; }
     if (state === 'apply') { ring(100); U.t.textContent = 'Installing update…'; U.sub.textContent = 'The app will restart'; }
   };
-  if (localStorage.getItem('amb_updated')) { localStorage.removeItem('amb_updated'); setTimeout(() => toast('✔ Updated to the latest version'), 600); }
+  if (localStorage.getItem('amb_updated')) { localStorage.removeItem('amb_updated'); setTimeout(() => toast('✔ Updated to the latest version', 4000), 600); }
   if ('serviceWorker' in navigator) {
     const sw = navigator.serviceWorker; let waiting = null, reloading = false; const had = !!sw.controller;
     const ready = w => { waiting = w; ui('ready'); };
@@ -154,11 +154,15 @@
     sw.register('sw.js').then(reg => {
       if (reg.waiting && sw.controller) ready(reg.waiting);
       reg.addEventListener('updatefound', () => { if (sw.controller) { ui('down', 0); track(reg.installing); } });
-      const check = () => reg.update().catch(() => {});
-      setInterval(check, 30 * 60 * 1000); document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+      // check on open, on return to the app, and every 30 minutes; a card hidden with "Later" comes back at the next check
+      const check = () => reg.update().catch(() => {}).then(() => { if (reg.waiting && sw.controller && U.box.hidden && !reloading) ready(reg.waiting); });
+      check(); setInterval(check, 30 * 60 * 1000); document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
     });
     sw.addEventListener('message', e => { if (e.data && e.data.type === 'progress' && sw.controller && !waiting) ui('down', e.data.pct); });
-    U.go.onclick = () => { ui('apply'); (waiting || {}).postMessage && waiting.postMessage('SKIP_WAITING'); };
+    U.go.onclick = () => {
+      ui('apply'); (waiting || {}).postMessage && waiting.postMessage('SKIP_WAITING');
+      setTimeout(() => { if (!reloading) { reloading = true; localStorage.setItem('amb_updated', '1'); location.reload(); } }, 6000);   // safety net: restart even if the browser is slow to switch
+    };
     U.later.onclick = () => { U.box.hidden = true; };
     sw.addEventListener('controllerchange', () => { if (!had || reloading) return; reloading = true; localStorage.setItem('amb_updated', '1'); location.reload(); });
   }
