@@ -62,10 +62,11 @@ nav button span{display:block;font-size:21px}nav button.on{color:var(--red)}
 .logo{border:0;background:none;padding:0;display:flex}
 .menu{text-align:center;padding:26px 0 10px}.menu img{border-radius:22px;box-shadow:0 6px 20px #e31e2433}.menu h2{margin:12px 0 2px;color:var(--navy)}.menu p{margin:0;color:var(--mute)}
 .splash{position:fixed;inset:0;z-index:8;overflow:hidden;padding-top:env(safe-area-inset-top);background:linear-gradient(#0008,#0006 40%,#000a),url(splash.jpg) center/cover #5a0a0f;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;padding:24px 24px calc(48px + env(safe-area-inset-bottom))}
-.badge{background:#e31e24;color:#fff;border:3px solid #fff;border-radius:99px;padding:10px 34px;font:800 clamp(34px,11vw,56px)/1.1 inherit;font-family:inherit;letter-spacing:.5px;box-shadow:0 6px 24px #0007}
+.badge{display:flex;gap:6px}
+.badge span{width:clamp(36px,12vw,54px);aspect-ratio:1;display:grid;place-items:center;border:3px solid #fff;border-radius:6px;color:#fff;font-weight:800;font-size:clamp(22px,7.5vw,34px);text-shadow:0 2px 8px #0008;box-shadow:0 2px 10px #0006}
 .splash .sub{font-size:clamp(24px,8vw,38px);font-weight:800;margin-top:14px;color:#fff;text-shadow:0 2px 10px #000a}
 .splash .tag{margin-top:8px;color:#fff;font-weight:600;letter-spacing:1px;text-transform:uppercase;font-size:13px;text-shadow:0 2px 8px #000a}
-.splash .go{margin-top:28px;border:2px solid #fff;background:#0004;color:#fff;border-radius:99px;padding:13px 32px;font:700 17px inherit;font-family:inherit;backdrop-filter:blur(4px)}
+.splash .go{margin-top:28px;border:0;background:#e31e24;color:#fff;border-radius:12px;padding:14px 38px;font:700 17px inherit;font-family:inherit;box-shadow:0 6px 18px #0008}
 body.on-splash #lang{z-index:9;top:calc(14px + env(safe-area-inset-top));bottom:auto}
 #toast{z-index:25}
 </style>
@@ -81,7 +82,7 @@ body.on-splash #lang{z-index:9;top:calc(14px + env(safe-area-inset-top));bottom:
 <main>
   <section class="tab on" id="t-splash">
     <div class="splash">
-      <div class="badge">Anemia</div>
+      <div class="badge" role="img" aria-label="Anemia"><span>A</span><span>N</span><span>E</span><span>M</span><span>I</span><span>A</span></div>
       <div class="sub">Mukt Bharat</div>
       <div class="tag">Anemia Free India Campaign</div>
       <button class="go" data-go="info">Continue →</button>
