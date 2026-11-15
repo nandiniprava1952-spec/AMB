@@ -52,22 +52,28 @@ nav button span{display:block;font-size:21px}nav button.on{color:var(--red)}
 .tag.Severe{background:#ffd6d6;color:#b00}.tag.Moderate{background:#ffe8c7;color:#8a4b00}.tag.Mild{background:#fff3b8;color:#6b5800}.tag.No{background:#d9f5e0;color:var(--ok)}
 .empty{text-align:center;color:var(--mute);padding:40px 10px}
 #toast{position:fixed;left:50%;bottom:140px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:9}#toast.on{opacity:1}
+.pill.inst{background:#fff;color:var(--red);animation:pulse 1.8s infinite}@keyframes pulse{50%{box-shadow:0 0 0 5px #fff6}}
+.sec{font-size:17px;color:var(--navy);margin:22px 2px 4px}.pic{margin-top:12px}
+@media(max-width:400px){header h1 small{display:none}header{gap:6px}.pill{padding:5px 8px}}
 </style>
 </head>
 <body>
 <header>
   <img src="icons/icon-192.png" alt="AMB logo">
   <h1>Anaemia Mukt Bharat<small>Screening &amp; treatment guide</small></h1>
-  <button class="pill" id="homeBtn" data-go="home" aria-label="Home">🏠 Home</button>
+  <button class="pill" id="homeBtn" data-go="home" aria-label="Home">🏠</button>
   <button class="pill" id="net" aria-label="Connection status"><i class="dot"></i><span>Online</span></button>
+  <button class="pill inst" id="install" hidden>⬇ Install</button>
 </header>
 <main>
   <section class="tab on" id="t-home">
     <img class="cover" src="cover.jpg" alt="Anaemia Mukt Bharat – Anaemia Free India Campaign">
     <button class="btn" data-go="screen">＋ New Screening</button>
     <button class="btn ghost" data-go="records">View Saved Records</button>
-    <button class="btn alt" id="install" hidden>⬇ Install App</button>
-    <p id="iosHint" class="empty" hidden>iPhone: tap <b>Share</b> → <b>Add to Home Screen</b> to install.</p>
+    <h2 class="sec">Know the symptoms &amp; signs</h2>
+    <img class="cover pic" src="symptoms.jpg" alt="Symptoms (ଲକ୍ଷଣ)">
+    <img class="cover pic" src="signs.jpg" alt="Signs (ଚିହ୍ନ)">
+    <img class="cover pic" src="clinical.jpg" alt="Clinical signs of anaemia: tongue, palm, eyelid, nail">
   </section>
   <section class="tab" id="t-screen">
     <div id="form"></div>

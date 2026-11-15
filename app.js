@@ -113,9 +113,15 @@
   document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) go(g.dataset.go); });
   const setLang = l => { lang = l; localStorage.setItem('amb_lang', l); $('#lang').textContent = l === 'en' ? 'ଓଡ଼ିଆ' : 'English'; document.documentElement.lang = l; refresh(); };
   $('#lang').onclick = () => setLang(lang === 'en' ? 'or' : 'en');
-  let dp; addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; $('#install').hidden = false; });
-  $('#install').onclick = async () => { dp.prompt(); await dp.userChoice; $('#install').hidden = true; };
-  if (/iphone|ipad/i.test(navigator.userAgent) && !navigator.standalone) $('#iosHint').hidden = false;
+  let dp; const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const installed = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  if (!installed()) { if (ios) $('#install').hidden = false;
+    addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; $('#install').hidden = false; }); }
+  addEventListener('appinstalled', () => { $('#install').hidden = true; toast('App installed ✔'); });
+  $('#install').onclick = async () => {
+    if (dp) { dp.prompt(); const r = await dp.userChoice; if (r.outcome === 'accepted') $('#install').hidden = true; }
+    else alert('Tap the Share button, then "Add to Home Screen".');
+  };
 
   const net = () => { const on = navigator.onLine, b = $('#net'); b.classList.toggle('off', !on); b.lastChild.textContent = on ? 'Online' : 'Offline'; };
   addEventListener('online', net); addEventListener('offline', net); net();
