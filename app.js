@@ -132,9 +132,9 @@
     else toast('To install: open the browser menu (⋮) and tap Install app or Add to Home screen.');
   };
 
-  const net = () => { const on = navigator.onLine, b = $('#net'); b.classList.toggle('off', !on); b.lastChild.textContent = on ? 'Online' : 'Offline'; };
-  addEventListener('online', net); addEventListener('offline', net); net();
-  $('#net').onclick = () => toast(navigator.onLine ? 'Online – app is saved and works offline too' : 'Offline mode – all features still work');
+  const net = () => { const on = navigator.onLine; ['#net', '#net2'].forEach(q => { const b = $(q); b.classList.toggle('off', !on); b.lastChild.textContent = on ? 'Online' : 'Offline'; }); };
+  addEventListener('online', net); addEventListener('offline', net); document.addEventListener('visibilitychange', () => { if (!document.hidden) net(); }); net();
+  $('#net').onclick = $('#net2').onclick = () => toast(navigator.onLine ? 'Online – app is saved and works offline too' : 'Offline mode – all features still work');
   setLang(lang); renderRecs();
   // ---------- update flow ----------
   const U = { box: $('#upd'), ring: $('#ring'), pct: $('#pct'), t: $('#utitle'), sub: $('#usub'), go: $('#ugo'), later: $('#ulater') };

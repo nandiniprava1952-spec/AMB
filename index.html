@@ -71,6 +71,7 @@ nav button span{display:block;font-size:21px}nav button.on{color:var(--red)}
 .splash .go.ghost{margin-top:12px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.55);box-shadow:none}
 body.on-splash #lang{z-index:9;top:calc(14px + env(safe-area-inset-top));bottom:auto}
 #toast{z-index:25}
+.splash .netc{position:absolute;top:calc(14px + env(safe-area-inset-top));left:14px;z-index:2;background:rgba(0,0,0,.45);border-color:rgba(255,255,255,.7);padding:8px 12px}.splash .netc.off{background:rgba(0,0,0,.55);color:#ffd23f;border-color:#ffd23f}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -85,6 +86,7 @@ body.on-splash #lang{z-index:9;top:calc(14px + env(safe-area-inset-top));bottom:
 <main>
   <section class="tab on" id="t-splash">
     <div class="splash">
+      <button class="pill netc" id="net2" type="button" aria-label="Connection status"><i class="dot"></i><span>Online</span></button>
       <div class="badge" role="img" aria-label="Anemia"><span>A</span><span>N</span><span>E</span><span>M</span><span>I</span><span>A</span></div>
       <div class="sub">Mukt Bharat</div>
       <div class="tag">Anemia Free India Campaign</div>
